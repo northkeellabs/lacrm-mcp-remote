@@ -7,15 +7,18 @@
   // global_fetch_strictly_public: SSRF protection for Client ID Metadata Document fetches.
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "observability": { "enabled": true },
+  // Public URL on our own domain; workers.dev disabled so the account subdomain is not exposed.
+  "workers_dev": false,
+  "routes": [{ "pattern": "lacrm-mcp.northkeellabs.com", "custom_domain": true }],
   "vars": {
     // The URL MCP clients connect to; every token is bound to it.
     // Local dev default. For a deploy, set it to https://<your-worker>.<your-subdomain>.workers.dev/mcp
-    "MCP_RESOURCE": "http://localhost:8787/mcp",
+    "MCP_RESOURCE": "https://lacrm-mcp.northkeellabs.com/mcp",
     "RATE_LIMIT_PER_MINUTE": "60"
   },
   "kv_namespaces": [
     // Create with: npx wrangler kv namespace create OAUTH_KV  (then paste the id here)
-    { "binding": "OAUTH_KV", "id": "00000000000000000000000000000000" }
+    { "binding": "OAUTH_KV", "id": "b3d39116c6fc4f1885e0f92de73b2372" }
   ],
   "durable_objects": {
     "bindings": [{ "name": "RATE_LIMITER", "class_name": "RateLimiter" }]
