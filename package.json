@@ -1,0 +1,32 @@
+{
+  "name": "lacrm-mcp-remote",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Unofficial remote MCP server for Less Annoying CRM on Cloudflare Workers with OAuth 2.1",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "deploy:dry": "wrangler deploy --dry-run --outdir .wrangler/dry",
+    "deploy": "wrangler deploy",
+    "e2e:live": "node scripts/e2e-live.mjs"
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.4",
+    "@modelcontextprotocol/server": "2.4.0",
+    "agents": "0.33.0",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261110.1",
+    "typescript": "7.0.2",
+    "@cloudflare/vitest-plugin": "1.6.1",
+    "vitest": "5.1.0",
+    "wrangler": "4.159.0"
+  }
+}

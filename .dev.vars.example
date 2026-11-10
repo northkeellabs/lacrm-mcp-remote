@@ -1,0 +1,5 @@
+# Copy to .dev.vars for local `wrangler dev`. .dev.vars is gitignored.
+# The Worker needs no LACRM secret of its own: each user pastes their own key on the
+# consent page and it is stored only inside their encrypted OAuth grant.
+# Optional overrides (placeholders only):
+RATE_LIMIT_PER_MINUTE="60"

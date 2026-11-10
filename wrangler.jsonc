@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lacrm-mcp-remote",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  // nodejs_compat: agents/mcp/server uses AsyncLocalStorage.
+  // global_fetch_strictly_public: SSRF protection for Client ID Metadata Document fetches.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "observability": { "enabled": true },
+  "vars": {
+    // The URL MCP clients connect to; every token is bound to it.
+    // Local dev default. For a deploy, set it to https://<your-worker>.<your-subdomain>.workers.dev/mcp
+    "MCP_RESOURCE": "http://localhost:8787/mcp",
+    "RATE_LIMIT_PER_MINUTE": "60"
+  },
+  "kv_namespaces": [
+    // Create with: npx wrangler kv namespace create OAUTH_KV  (then paste the id here)
+    { "binding": "OAUTH_KV", "id": "00000000000000000000000000000000" }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "RATE_LIMITER", "class_name": "RateLimiter" }]
+  },
+  // SQLite-backed Durable Objects work on the Workers free plan.
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["RateLimiter"] }]
+}
