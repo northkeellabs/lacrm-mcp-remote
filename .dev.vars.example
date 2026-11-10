@@ -3,3 +3,4 @@
 # consent page and it is stored only inside their encrypted OAuth grant.
 # Optional overrides (placeholders only):
 RATE_LIMIT_PER_MINUTE="60"
+MCP_RESOURCE="http://localhost:8787/mcp"

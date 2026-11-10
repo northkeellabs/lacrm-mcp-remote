@@ -9,3 +9,4 @@ logs/
 .env.*
 dist/
 coverage/
+REPORT.md
