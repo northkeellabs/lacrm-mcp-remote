@@ -1,8 +1,16 @@
 # lacrm-mcp-remote
 
-A remote MCP server for [Less Annoying CRM](https://www.lessannoyingcrm.com/) (LACRM), hosted on Cloudflare Workers, with OAuth 2.1 sign-in. It exposes the same 10 tools as the local lacrm-mcp server (stdio, Python, also by Northkeel Labs), but over Streamable HTTP, so it works as a claude.ai custom connector and in any MCP client that supports remote servers with OAuth.
+A remote MCP server for [Less Annoying CRM](https://www.lessannoyingcrm.com/) (LACRM), hosted on Cloudflare Workers, with OAuth 2.1 sign-in. It exposes the same 10 tools as the local [lacrm-mcp](https://github.com/northkeellabs/lacrm-mcp) server (stdio, Python, also by Northkeel Labs), but over Streamable HTTP, so it works as a claude.ai custom connector and in any MCP client that supports remote servers with OAuth.
 
 Independent and unofficial. Not affiliated with, endorsed by or supported by Less Annoying CRM.
+
+## Hosted endpoint
+
+```
+https://lacrm-mcp.northkeellabs.com/mcp
+```
+
+Northkeel Labs runs this code at that URL. Paste it into any MCP client that supports remote servers with OAuth (see [Connect a client](#connect-a-client)), sign in, and paste your LACRM API key on the consent page. The Worker stores only the encrypted OAuth grant; it keeps no other copy of your key or CRM data. Free, best effort, no SLA, 60 tool calls per minute per connection. To run it on your own Cloudflare account instead, see [Deploy your own](#deploy-your-own).
 
 ## Why remote + OAuth
 
@@ -37,7 +45,7 @@ flowchart LR
 
 Code map: `src/index.ts` (OAuthProvider wiring), `src/authorize.ts` (consent page), `src/mcp.ts` (protected endpoint), `src/tools.ts` (the 10 tools), `src/lacrm.ts` (API client, retries, error mapping), `src/security.ts` (truncation, untrusted-data wrapper, redaction), `src/ratelimit.ts` (Durable Object).
 
-Built on `@cloudflare/workers-oauth-provider` 1.2.4, `agents` 0.33.0 (`createMcpHandler`) and the MCP TypeScript SDK v2 (`@modelcontextprotocol/server` 2.4.0). The handler is stateless: every request gets a fresh MCP server built for that grant. It serves both 2025-era Streamable HTTP clients and the stateless 2026 protocol from the same `/mcp` endpoint. There is no `/sse` endpoint.
+Built on `@cloudflare/workers-oauth-provider` 1.2.4, `agents` 0.33.0 (`createMcpHandler`) and the MCP TypeScript SDK v2 (`@modelcontextprotocol/server` 2.4.0). The handler is stateless: every request gets a fresh MCP server built for that grant. It serves both 2025-era Streamable HTTP clients and the stateless 2026 protocol from the same `/mcp` endpoint. There is no `/sse` endpoint. `McpAgent` is deprecated as of `agents` 0.33.0, so this uses `createMcpHandler` instead; the only Durable Object is the per-grant rate limiter.
 
 ## The auth flow, step by step
 
@@ -79,7 +87,12 @@ npx wrangler login
 npx wrangler kv namespace create OAUTH_KV
 ```
 
-Paste the printed namespace id into `kv_namespaces[0].id` in `wrangler.jsonc`. Then set `vars.MCP_RESOURCE` to the public URL of the MCP endpoint, which is `https://lacrm-mcp-remote.<your-workers-subdomain>.workers.dev/mcp` (your workers.dev subdomain is shown in the Cloudflare dashboard under Workers and Pages). Tokens are bound to this exact URL. Then:
+Paste the printed namespace id into `kv_namespaces[0].id` in `wrangler.jsonc` (the id in the repo belongs to the hosted instance and will not work on your account). The repo config serves the Worker on our custom domain, so change the address too:
+
+- Your own domain (the zone must be on the same Cloudflare account): set `routes[0].pattern` to your hostname, for example `mcp.example.com`, and `vars.MCP_RESOURCE` to `https://mcp.example.com/mcp`.
+- Or workers.dev: delete the `routes` entry, set `"workers_dev": true`, and set `vars.MCP_RESOURCE` to `https://lacrm-mcp-remote.<your-workers-subdomain>.workers.dev/mcp` (your subdomain is shown in the Cloudflare dashboard under Workers and Pages).
+
+Tokens are bound to this exact URL. Then:
 
 ```sh
 npm test                 # unit and integration tests in the Workers runtime
@@ -88,18 +101,18 @@ npx wrangler deploy
 
 No server-side secret is needed: each user's LACRM key arrives through the consent page and is stored only in their encrypted grant. Optional settings are plain vars in `wrangler.jsonc` (`RATE_LIMIT_PER_MINUTE`, default 60). If you later add a secret of your own, use `npx wrangler secret put NAME` in production and `.dev.vars` locally (see `.dev.vars.example`; `.dev.vars` is gitignored).
 
-Local development: `npx wrangler dev` serves everything at `http://localhost:8787` (the default `MCP_RESOURCE`).
+Local development: copy `.dev.vars.example` to `.dev.vars` (it sets `MCP_RESOURCE` to `http://localhost:8787/mcp`, overriding the production value), then `npx wrangler dev` serves everything at `http://localhost:8787`.
 
 ## Connect a client
 
-Use your endpoint URL, for example `https://lacrm-mcp-remote.<sub>.workers.dev/mcp`.
+Use the hosted endpoint `https://lacrm-mcp.northkeellabs.com/mcp` or your own deployment's URL.
 
 - **claude.ai**: Settings > Connectors > Add custom connector. Paste the URL, then Connect. A browser tab opens the consent page; paste your LACRM key (LACRM: Settings > Programmer API) and choose the access level.
 - **Claude Desktop**: Settings > Connectors > Add custom connector, same URL and flow as claude.ai.
 - **Cursor**: add to `~/.cursor/mcp.json` and enable the server; Cursor opens the browser for sign-in.
 
   ```json
-  { "mcpServers": { "lacrm": { "url": "https://lacrm-mcp-remote.<sub>.workers.dev/mcp" } } }
+  { "mcpServers": { "lacrm": { "url": "https://lacrm-mcp.northkeellabs.com/mcp" } } }
   ```
 
 - **MCP Inspector**: `npx @modelcontextprotocol/inspector`, choose transport "Streamable HTTP", enter the URL, and complete its OAuth sign-in flow. Against local dev use `http://localhost:8787/mcp`.
@@ -119,7 +132,7 @@ Summary (details and threat model in [SECURITY.md](SECURITY.md)):
 
 ## Tests
 
-Test results, 2026-11-10: `npm test` 50 tests passing (Workers runtime via `@cloudflare/vitest-plugin`, LACRM mocked at `fetch`); `tsc --noEmit` clean; `wrangler deploy --dry-run` succeeds; live end-to-end (`scripts/e2e-live.mjs` against `wrangler dev` and a real LACRM account holding demo data) 20/20 steps passing. Redacted output: [scripts/e2e-live-output.txt](scripts/e2e-live-output.txt).
+Test results, 2026-11-10: `npm test` 50 tests passing (Workers runtime via `@cloudflare/vitest-plugin`, LACRM mocked at `fetch`); `tsc --noEmit` clean; `wrangler deploy --dry-run` succeeds; live end-to-end (`scripts/e2e-live.mjs` against `wrangler dev` and a real LACRM account holding demo data) 20/20 steps passing, and the same 20/20 against the production deployment at `https://lacrm-mcp.northkeellabs.com`. Redacted output: [local](scripts/e2e-live-output.txt), [production](scripts/e2e-live-output-production.txt). Also tested 2026-11-10 as a claude.ai custom connector (read-only grant).
 
 The tests cover each tool's request mapping and output shape, truncation, pagination, the untrusted-data wrapper, error mapping and redaction, retry policy, scope gating (a read grant can neither see nor call write tools, including in a batch), the consent page (bad key, missing or forged CSRF token, unknown redirect URI, unknown client, HTML escaping, deny, single-use handle), rate limiting, and that the key never appears in any response or log line.
 

@@ -12,7 +12,7 @@
   "routes": [{ "pattern": "lacrm-mcp.northkeellabs.com", "custom_domain": true }],
   "vars": {
     // The URL MCP clients connect to; every token is bound to it.
-    // Local dev default. For a deploy, set it to https://<your-worker>.<your-subdomain>.workers.dev/mcp
+    // Production value for the hosted instance. Self-hosting: see README "Deploy your own". Local dev: .dev.vars overrides it.
     "MCP_RESOURCE": "https://lacrm-mcp.northkeellabs.com/mcp",
     "RATE_LIMIT_PER_MINUTE": "60"
   },
