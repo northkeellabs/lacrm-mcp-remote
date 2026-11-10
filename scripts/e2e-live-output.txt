@@ -1,0 +1,23 @@
+lacrm-mcp-remote live e2e, 2026-11-10T06:34:19.788Z, base http://localhost:8787
+PASS  LACRM_API_KEY present in environment  -- value redacted
+PASS  unauthenticated /mcp returns 401 with resource_metadata  -- Bearer [REDACTED]"OAuth", resource_metadata="http://localhost:8787/.well-known/oauth-protected-resource/mcp", scope="lacrm.read"
+PASS  protected resource metadata (RFC 9728)  -- {"resource":"http://localhost:8787/mcp","authorization_servers":["http://localhost:8787"],"scopes_supported":["lacrm.read"],"bearer_methods_supported":["header"],"resource_name":"Less Annoying CRM (unofficial MCP server)"}
+PASS  authorization server metadata (RFC 8414): S256, DCR, scopes  -- {"issuer":"http://localhost:8787","registration_endpoint":"http://localhost:8787/oauth/register","scopes_supported":["lacrm.read","lacrm.write"]}
+PASS  [read] dynamic client registration  -- HTTP 201
+PASS  [read] GET /authorize renders consent page  -- HTTP 200, CSP set, client name shown: true
+PASS  [read] consent form accepted, redirect with code  -- HTTP 302
+PASS  [read] token exchange  -- HTTP 200, scope="lacrm.read"
+PASS  [read] MCP initialize  -- HTTP 200, protocol 2025-11-25, server lacrm
+PASS  [read] tools/list returns 6 tools  -- get_contact, list_contact_notes, list_pipeline_items, list_pipelines, list_tasks, search_contacts
+PASS  [read] search_contacts "Demo" finds Maya Demo and Harbour Lane Bakery (Demo)  -- names: ["Maya Demo","Tom Demo","Harbour Lane Bakery (Demo)"], has_more_results=false, data_notice present=true
+PASS  [read] write tool add_note is refused  -- This connection is read-only (scope lacrm.read). Write tools are disabled; reconnect and choose read and write access to use them.
+PASS  [write] dynamic client registration  -- HTTP 201
+PASS  [write] GET /authorize renders consent page  -- HTTP 200, CSP set, client name shown: true
+PASS  [write] consent form accepted, redirect with code  -- HTTP 302
+PASS  [write] token exchange  -- HTTP 200, scope="lacrm.read lacrm.write"
+PASS  [write] MCP initialize  -- HTTP 200, protocol 2025-11-25, server lacrm
+PASS  [write] tools/list returns 10 tools  -- add_note, create_contact, create_task, get_contact, list_contact_notes, list_pipeline_items, list_pipelines, list_tasks, search_contacts, update_pipeline_item_status
+PASS  [write] search_contacts "Demo" finds Maya Demo and Harbour Lane Bakery (Demo)  -- names: ["Maya Demo","Tom Demo","Harbour Lane Bakery (Demo)"], has_more_results=false, data_notice present=true
+PASS  [write] add_note on Maya Demo  -- note_id=4137356728998320956916814587854, text="lacrm-mcp-remote live test 2026-11-10T06:34:23.310Z"
+
+SUMMARY: 20/20 steps passed
