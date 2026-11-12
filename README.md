@@ -4,6 +4,14 @@ A remote MCP server for [Less Annoying CRM](https://www.lessannoyingcrm.com/) (L
 
 Independent and unofficial. Not affiliated with, endorsed by or supported by Less Annoying CRM.
 
+**Video walkthrough (62 s, voice + captions):** Claude using this hosted server as a claude.ai connector on a live account with demo data, the read-only mode, OAuth 2.1 sign-in and the test results. GitHub starts videos muted: click the speaker icon in the player to hear the voiceover.
+
+
+
+https://github.com/user-attachments/assets/99e98a72-4f8e-41c6-b0c6-46789ef81c4c
+
+
+
 ## Hosted endpoint
 
 ```
