@@ -149,3 +149,7 @@ To run the live test yourself: start `npx wrangler dev`, then `LACRM_API_KEY=...
 ## Disclaimer
 
 This is an independent, unofficial project. It is not affiliated with, endorsed by or supported by Less Annoying CRM. "Less Annoying CRM" is a trademark of its owner. Use at your own risk; review the code before connecting a production CRM account. MIT licensed, see [LICENSE](LICENSE).
+
+---
+
+Built by [Northkeel Labs](https://northkeellabs.com): AI agents and MCP servers that run inside your own systems.
