@@ -34,4 +34,4 @@ A user's LACRM API key (full access to their CRM data within the key's permissio
 
 ## Reporting a vulnerability
 
-Email hello@northkeellabs.com with details. Please do not open a public issue for security reports.
+Email contact@northkeellabs.com with details. Please do not open a public issue for security reports.
