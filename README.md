@@ -1,5 +1,7 @@
 # lacrm-mcp-remote
 
+[![northkeellabs/lacrm-mcp-remote MCP server](https://glama.ai/mcp/servers/northkeellabs/lacrm-mcp-remote/badges/score.svg)](https://glama.ai/mcp/servers/northkeellabs/lacrm-mcp-remote) [![Less Annoying CRM (unofficial) MCP connector](https://glama.ai/mcp/connectors/com.northkeellabs/lacrm-mcp-remote/badges/score.svg)](https://glama.ai/mcp/connectors/com.northkeellabs/lacrm-mcp-remote)
+
 A remote MCP server for [Less Annoying CRM](https://www.lessannoyingcrm.com/) (LACRM), hosted on Cloudflare Workers, with OAuth 2.1 sign-in. It exposes the same 10 tools as the local [lacrm-mcp](https://github.com/northkeellabs/lacrm-mcp) server (stdio, Python, also by Northkeel Labs), but over Streamable HTTP, so it works as a claude.ai custom connector and in any MCP client that supports remote servers with OAuth.
 
 Independent and unofficial. Not affiliated with, endorsed by or supported by Less Annoying CRM.
